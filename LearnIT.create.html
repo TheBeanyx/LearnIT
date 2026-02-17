@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html lang="hu">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LearnIT - EDITOR - Készítse el saját kérdéseit</title>
+    <style>
+        :root { --primary: #4A90E2; --bg: #f0f2f5; --white: #ffffff; --text: #2c3e50; }
+        body { font-family: 'Segoe UI', sans-serif; background-color: var(--bg); color: var(--text); padding: 0; margin: 0; padding-bottom: 50px; }
+        
+        /* Navigáció */
+        .create-nav { 
+            background: var(--white); padding: 1rem 2rem; 
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05); 
+            display: flex; justify-content: space-between; align-items: center;
+            position: sticky; top: 0; z-index: 1000;
+        }
+        .logo { font-size: 1.5rem; font-weight: 800; }
+        .logo span { color: var(--primary); }
+        
+        .btn-back { 
+            text-decoration: none; color: #666; font-weight: 600; 
+            display: flex; align-items: center; gap: 5px; 
+            padding: 8px 15px; border-radius: 10px; transition: 0.3s;
+        }
+        .btn-back:hover { background: #eee; color: var(--text); }
+
+        .container { max-width: 900px; margin: 2rem auto; padding: 0 15px; }
+        
+        .card { background: var(--white); padding: 20px; border-radius: 15px; box-shadow: 0 5px 15px rgba(0,0,0,0.05); margin-bottom: 20px; }
+        .input-group { margin-bottom: 15px; }
+        label { display: block; font-weight: 600; margin-bottom: 5px; font-size: 0.9rem; }
+        input, select, textarea { width: 100%; padding: 12px; border: 2px solid #eee; border-radius: 10px; box-sizing: border-box; }
+        
+        .q-card { border-left: 6px solid var(--primary); position: relative; }
+        
+        .option-row { display: flex; gap: 10px; margin-bottom: 8px; }
+        .tf-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+        
+        .order-item { 
+            background: #f8f9fa; border: 2px dashed #ccc; padding: 10px; 
+            margin: 5px 0; border-radius: 8px; cursor: move; display: flex; align-items: center; 
+        }
+        .order-item:active { opacity: 0.5; }
+
+        .btn { padding: 12px 20px; border: none; border-radius: 10px; cursor: pointer; font-weight: bold; transition: 0.3s; }
+        .btn-add { background: #eef5ff; color: var(--primary); border: 2px dashed var(--primary); width: 100%; margin-bottom: 20px; }
+        .btn-save { background: var(--primary); color: white; width: 100%; font-size: 1.1rem; }
+        .btn-save:disabled { background: #ccc; cursor: not-allowed; }
+        
+        .remove-btn { position: absolute; top: 10px; right: 10px; color: #ff4d4d; cursor: pointer; font-weight: bold; font-size: 1.2rem; }
+    </style>
+</head>
+<body>
+
+<nav class="create-nav">
+    <a href="LearnIT.teacher.html" class="btn-back">← Vissza</a>
+    <div class="logo">Learn<span>IT</span> EDITOR</div>
+    <div style="width: 140px;"></div> </nav>
+
+<div class="container">
+    <div class="card">
+        <h2>Feladatsor beállításai</h2>
+        <div class="input-group">
+            <label>Cím</label>
+            <input type="text" id="mainTitle" placeholder="Pl. Történelem KVÍZ">
+        </div>
+        <div class="input-group">
+            <label>Osztálykulcs</label>
+            <input type="text" id="classCode" placeholder="PL: TÖRI101">
+        </div>
+    </div>
+
+    <div id="questionsWrapper"></div>
+
+    <button class="btn btn-add" id="addQuestionBtn">+ Új kérdés hozzáadása</button>
+    <button class="btn btn-save" id="saveBtn">Mentés és publikálás</button>
+    <div id="status" style="display:none; text-align:center; margin-top:20px; font-weight:bold; padding: 15px; border-radius: 10px;"></div>
+</div>
+
+<script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+    import { getFirestore, collection, addDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+
+    const firebaseConfig = {
+        apiKey: "AIzaSyA6_AtJME0kTZAwNVRh_2c0X_OGFkAD3Yo",
+        authDomain: "learnit-11.firebaseapp.com",
+        projectId: "learnit-11",
+        storageBucket: "learnit-11.firebasestorage.app",
+        messagingSenderId: "487572253554",
+        appId: "1:487572253554:web:016626613daef464dd4beb"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+
+    const wrapper = document.getElementById('questionsWrapper');
+    const statusDiv = document.getElementById('status');
+
+    function createQuestion() {
+        const qId = Date.now();
+        const div = document.createElement('div');
+        div.className = 'card q-card';
+        div.id = `q-${qId}`;
+        div.innerHTML = `
+            <span class="remove-btn" onclick="this.parentElement.remove()">×</span>
+            <div class="input-group">
+                <label>Típus választása</label>
+                <select class="type-select" onchange="updateFields(${qId})">
+                    <option value="text">Szöveges válasz</option>
+                    <option value="multiple">Feleletválasztó</option>
+                    <option value="truefalse">Igaz / Hamis</option>
+                    <option value="slider">Idővonal (Slider)</option>
+                    <option value="order">Sorrendbe rakás</option>
+                </select>
+            </div>
+            <div class="input-group">
+                <label>Kérdés szövege</label>
+                <input type="text" class="question-text" placeholder="Mi a kérdés?">
+            </div>
+            <div id="fields-${qId}" class="dynamic-fields"></div>
+        `;
+        wrapper.appendChild(div);
+        updateFields(qId);
+    }
+
+    window.updateFields = (id) => {
+        const type = document.querySelector(`#q-${id} .type-select`).value;
+        const container = document.getElementById(`fields-${id}`);
+        container.innerHTML = "";
+
+        if (type === 'text') {
+            container.innerHTML = `<label>Helyes válasz</label><input type="text" class="ans" placeholder="A várt kulcsszó">`;
+        } 
+        else if (type === 'multiple') {
+            container.innerHTML = `
+                <label>Opciók (Az első legyen a helyes!)</label>
+                <div class="option-row"><input type="text" class="opt" placeholder="Helyes válasz"></div>
+                <div class="option-row"><input type="text" class="opt" placeholder="Rossz válasz 1"></div>
+                <div class="option-row"><input type="text" class="opt" placeholder="Rossz válasz 2"></div>
+            `;
+        }
+        else if (type === 'truefalse') {
+            container.innerHTML = `
+                <div class="tf-grid">
+                    <div><label>Igaz opció</label><input type="text" class="tf-true" value="Igaz"></div>
+                    <div><label>Hamis opció</label><input type="text" class="tf-false" value="Hamis"></div>
+                </div>
+            `;
+        }
+        else if (type === 'slider') {
+            container.innerHTML = `
+                <div class="tf-grid">
+                    <div><label>Min érték</label><input type="number" class="s-min" value="1800"></div>
+                    <div><label>Max érték</label><input type="number" class="s-max" value="2000"></div>
+                </div>
+                <label style="margin-top:10px">Helyes érték</label>
+                <input type="number" class="s-val" placeholder="Pl. 1848">
+            `;
+        }
+        else if (type === 'order') {
+            container.innerHTML = `
+                <label>Elemek (A helyes sorrendben add meg!)</label>
+                <div class="order-list">
+                    <div class="order-item" draggable="true">☰ <input type="text" class="ord-val" style="margin-left:10px" placeholder="1. elem"></div>
+                    <div class="order-item" draggable="true">☰ <input type="text" class="ord-val" style="margin-left:10px" placeholder="2. elem"></div>
+                </div>
+                <button type="button" onclick="addOrderItem(this)" style="font-size:0.8rem; margin-top:5px; cursor:pointer">+ Elem hozzáadása</button>
+            `;
+            initDragAndDrop();
+        }
+    };
+
+    window.addOrderItem = (btn) => {
+        const list = btn.previousElementSibling;
+        const div = document.createElement('div');
+        div.className = 'order-item';
+        div.draggable = true;
+        div.innerHTML = `☰ <input type="text" class="ord-val" style="margin-left:10px" placeholder="Új elem">`;
+        list.appendChild(div);
+        initDragAndDrop();
+    };
+
+    function initDragAndDrop() {
+        const items = document.querySelectorAll('.order-item');
+        items.forEach(item => {
+            item.addEventListener('dragstart', () => item.classList.add('dragging'));
+            item.addEventListener('dragend', () => item.classList.remove('dragging'));
+        });
+        document.querySelectorAll('.order-list').forEach(list => {
+            list.addEventListener('dragover', e => {
+                e.preventDefault();
+                const dragging = document.querySelector('.dragging');
+                const afterElement = [...list.querySelectorAll('.order-item:not(.dragging)')].reduce((closest, child) => {
+                    const box = child.getBoundingClientRect();
+                    const offset = e.clientY - box.top - box.height / 2;
+                    if (offset < 0 && offset > closest.offset) return { offset: offset, element: child };
+                    else return closest;
+                }, { offset: Number.NEGATIVE_INFINITY }).element;
+                if (afterElement == null) list.appendChild(dragging);
+                else list.insertBefore(dragging, afterElement);
+            });
+        });
+    }
+
+    document.getElementById('addQuestionBtn').addEventListener('click', createQuestion);
+
+    document.getElementById('saveBtn').addEventListener('click', async () => {
+        const title = document.getElementById('mainTitle').value;
+        const classCode = document.getElementById('classCode').value;
+        
+        if(!title || !classCode) {
+            showStatus("Kérlek adj meg címet és osztálykulcsot!", "#f8d7da", "#721c24");
+            return;
+        }
+
+        const tasks = [];
+        document.querySelectorAll('.q-card').forEach(card => {
+            const type = card.querySelector('.type-select').value;
+            let data = { type, question: card.querySelector('.question-text').value };
+
+            if(type === 'multiple') data.options = [...card.querySelectorAll('.opt')].map(i => i.value);
+            if(type === 'truefalse') data.labels = [card.querySelector('.tf-true').value, card.querySelector('.tf-false').value];
+            if(type === 'slider') data.range = { min: card.querySelector('.s-min').value, max: card.querySelector('.s-max').value, correct: card.querySelector('.s-val').value };
+            if(type === 'order') data.order = [...card.querySelectorAll('.ord-val')].map(i => i.value);
+            if(type === 'text') data.answer = card.querySelector('.ans').value;
+
+            tasks.push(data);
+        });
+
+        try {
+            document.getElementById('saveBtn').disabled = true;
+            document.getElementById('saveBtn').innerText = "Mentés...";
+            
+            await addDoc(collection(db, "LearnIT Task"), {
+                title, classCode, tasks, createdAt: serverTimestamp()
+            });
+
+            showStatus("✅ Sikeres mentés! Átirányítás...", "#d4edda", "#155724");
+            
+            // 2 másodperc múlva visszavisz a tanári oldalra
+            setTimeout(() => {
+                window.location.href = "LearnIT.teacher.html";
+            }, 2000);
+
+        } catch (e) { 
+            showStatus("Hiba: " + e.message, "#f8d7da", "#721c24");
+            document.getElementById('saveBtn').disabled = false;
+        }
+    });
+
+    function showStatus(text, bg, color) {
+        statusDiv.style.display = "block";
+        statusDiv.innerText = text;
+        statusDiv.style.backgroundColor = bg;
+        statusDiv.style.color = color;
+    }
+
+    createQuestion();
+</script>
+</body>
+</html>

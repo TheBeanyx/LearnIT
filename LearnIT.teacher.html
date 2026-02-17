@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="hu">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LearnIT - Tanári Mód</title>
+    <link rel="stylesheet" href="style.student.css">
+    <link rel="stylesheet" href="style.teacher.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body>
+
+    <header class="top-header">
+        <div class="header-main-row">
+            <div class="logo">Learn<span>IT</span> <small>| Tanári Panel</small></div>
+            <div class="header-actions">
+                <div class="icon-wrapper" title="Beállítások">
+                    <i class="fas fa-cog gear-icon"></i>
+                    <span class="tooltip-text">Beállítások</span>
+                </div>
+                <div class="user-avatar-mini teacher-badge"></div>
+            </div>
+        </div>
+    </header>
+
+    <main class="content-wrapper">
+        <section class="recommended-section">
+            <div class="section-header">
+                <h2>Saját létrehozott feladatok</h2>
+            </div>
+            <div class="recommendation-container" id="teacherTaskGrid">
+                <p>Betöltés...</p>
+            </div>
+        </section>
+    </main>
+
+    <button class="fab-add" onclick="window.location.href='LearnIT.create.html'" title="Új feladat">
+        <i class="fas fa-plus"></i>
+    </button>
+
+    <script type="module" src="script.teacher.js"></script>
+</body>
+</html>

@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="hu">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LearnIT - Diák Könyvtár</title>
+    <link rel="stylesheet" href="style.student.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body>
+
+    <header class="top-header">
+        <div class="header-main-row">
+            <div class="logo">Learn<span>IT</span></div>
+            
+            <div class="search-controls">
+                <div class="input-group search-keyword">
+                    <i class="fas fa-filter"></i>
+                    <input type="text" id="keywordSearch" placeholder="Téma vagy kulcsszó...">
+                </div>
+
+                <div class="input-group search-key">
+                    <i class="fas fa-hashtag"></i>
+                    <input type="text" id="classKeySearch" placeholder="Pontos feladatkulcs...">
+                </div>
+
+                <div class="filter-group">
+                    <select id="mainFilter">
+                        <option value="all">Minden nehézség</option>
+                        <option value="easy">Könnyű</option>
+                        <option value="medium">Közepes</option>
+                        <option value="hard">Nehéz</option>
+                    </select>
+                </div>
+
+                <button class="search-btn-final" onclick="executeComplexSearch()" title="Keresés indítása">
+                    <i class="fas fa-search"></i>
+                </button>
+            </div>
+
+            <div class="header-actions">
+                <div class="icon-wrapper" title="Beállítások">
+                    <i class="fas fa-cog gear-icon"></i>
+                    <span class="tooltip-text">Beállítások</span>
+                </div>
+                <div class="icon-wrapper" title="Értesítések">
+                    <i class="fas fa-bell"></i>
+                </div>
+                <div class="user-avatar-mini"></div>
+            </div>
+        </div>
+    </header>
+
+    <main class="content-wrapper">
+        <section class="topic-section">
+            <h2 class="section-title">Fedezz fel tantárgyak szerint</h2>
+            <div class="topic-grid">
+                <div class="topic-card math" onclick="quickFilter('matek')">
+                    <div class="topic-icon"><i class="fas fa-calculator"></i></div>
+                    <span>Matek</span>
+                </div>
+                <div class="topic-card history" onclick="quickFilter('tori')">
+                    <div class="topic-icon"><i class="fas fa-monument"></i></div>
+                    <span>Töri</span>
+                </div>
+                <div class="topic-card it" onclick="quickFilter('tori')">
+                    <div class="topic-icon"><i class="fas fa-language"></i></div>
+                    <span>Nyelv</span>
+                </div>
+ <div class="topic-card " onclick="quickFilter('irodalom')">
+                    <div class="topic-icon"><i class="fas fa-book"></i></div>
+                    <span>Irodalom</span>
+                </div>
+ <div class="topic-card " onclick="quickFilter('irodalom')">
+                    <div class="topic-icon"><i class="fas fa-book-open"></i></div>
+                    <span>Magyar nyelv</span>
+                </div>
+                <div class="topic-card it" onclick="quickFilter('it')">
+                    <div class="topic-icon"><i class="fas fa-laptop"></i></div>
+                    <span>Info / IT</span>
+                </div>
+                <div class="topic-card science" onclick="quickFilter('kemia')">
+                    <div class="topic-icon"><i class="fas fa-microscope"></i></div>
+                    <span>Kémia</span>
+                </div>
+   <div class="topic-card science" onclick="quickFilter('fizika')">
+                    <div class="topic-icon"><i class="fas fa-flask"></i></div>
+                    <span>Fizika</span>
+                </div>
+            </div>
+        </section>
+
+        <section class="recommended-section">
+            <h2>Neked ajánlott feladatok</h2>
+            <div class="recommendation-container" id="taskGrid">
+                <p style="text-align: center; grid-column: 1/-1;">Használd a keresőt a feladatok betöltéséhez!</p>
+            </div>
+        </section>
+    </main>
+
+    <div id="taskModal" class="modal">
+        <div class="modal-content">
+            <span class="close-btn" onclick="closeModal()">&times;</span>
+            <div id="modalData">
+                <h2 id="m-title">Feladat címe</h2>
+                <div class="modal-meta">
+                    Szerző: <span id="m-teacher">-</span> | Szint: <span id="m-time">-</span>
+                </div>
+                <p id="m-desc" class="modal-description"></p>
+                <hr>
+                <h3>Minta kérdések:</h3>
+                <ul id="m-questions" class="question-list"></ul>
+                <div class="modal-footer">
+                    <button class="btn-start-final" onclick="startQuiz()">Megoldás indítása</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script type="module" src="script.js"></script>
+</body>
+</html>

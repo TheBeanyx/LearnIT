@@ -1,0 +1,238 @@
+:root {
+    --primary: #4A90E2;
+    --success: #2ecc71;
+    --bg-gray: #f0f2f5;
+    --text-main: #2C3E50;
+    --white: #ffffff;
+    --border: #dcdde1;
+}
+
+body {
+    font-family: 'Segoe UI', sans-serif;
+    background-color: var(--bg-gray);
+    margin: 0;
+    color: var(--text-main);
+}
+
+/* Navigáció */
+.create-nav {
+    background: var(--white);
+    padding: 1rem 2rem;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    position: sticky;
+    top: 0;
+    z-index: 100;
+}
+
+.nav-content {
+    max-width: 1400px;
+    margin: 0 auto;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.btn-back {
+    background: none;
+    border: 1px solid var(--border);
+    padding: 8px 15px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: 600;
+}
+
+.btn-publish {
+    background: var(--primary);
+    color: white;
+    border: none;
+    padding: 10px 25px;
+    border-radius: 8px;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+/* Elrendezés */
+.editor-container {
+    max-width: 1200px;
+    margin: 2rem auto;
+    display: flex;
+    gap: 2rem;
+    padding: 0 1rem;
+}
+
+.editor-sidebar {
+    flex: 1;
+}
+
+.editor-main {
+    flex: 3;
+}
+
+/* Kártyák */
+.sidebar-card, .content-card, .question-card {
+    background: var(--white);
+    padding: 1.5rem;
+    border-radius: 12px;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+    margin-bottom: 1.5rem;
+}
+
+.title-input {
+    width: 100%;
+    font-size: 2rem;
+    font-weight: 800;
+    border: none;
+    outline: none;
+    margin-bottom: 1rem;
+}
+
+.desc-input {
+    width: 100%;
+    border: none;
+    outline: none;
+    font-size: 1.1rem;
+    resize: none;
+    min-height: 100px;
+}
+
+/* Kérdés blokkok */
+.question-card {
+    border-left: 6px solid var(--primary);
+    position: relative;
+    animation: fadeIn 0.4s ease;
+}
+
+@keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } }
+
+.q-header {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 10px;
+}
+
+.q-input {
+    width: 100%;
+    padding: 12px;
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    font-size: 1rem;
+    margin-bottom: 10px;
+}
+
+.btn-remove-q {
+    color: #e74c3c;
+    background: none;
+    border: none;
+    cursor: pointer;
+}
+
+.btn-add-question {
+    width: 100%;
+    padding: 1.5rem;
+    border: 2px dashed var(--border);
+    background: transparent;
+    border-radius: 12px;
+    cursor: pointer;
+    font-weight: bold;
+    color: #7f8c8d;
+    transition: 0.3s;
+}
+
+.btn-add-question:hover {
+    background: var(--white);
+    border-color: var(--primary);
+    color: var(--primary);
+}
+
+.input-block { margin-bottom: 1.2rem; }
+.input-block label { display: block; font-weight: bold; margin-bottom: 5px; font-size: 0.85rem; }
+.input-block input, .input-block select {
+    width: 100%; padding: 8px; border-radius: 6px; border: 1px solid var(--border);
+}
+
+/* ... Az előző create CSS részek ... */
+
+#toast-container {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    z-index: 9999;
+}
+
+.toast {
+    background: #ffffff;
+    color: #2C3E50;
+    padding: 16px 24px;
+    border-radius: 12px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+    margin-bottom: 10px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    border-left: 6px solid #4A90E2;
+    transform: translateX(120%);
+    transition: transform 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+}
+
+.toast.show {
+    transform: translateX(0);
+}
+
+.toast.success { border-left-color: #2ecc71; }
+.toast.error { border-left-color: #e74c3c; }
+
+.toast i { font-size: 1.2rem; }
+.toast.success i { color: #2ecc71; }
+.toast.error i { color: #e74c3c; }
+
+/* Formázás a kérdés-kártyákhoz */
+.question-card {
+    background: white;
+    padding: 20px;
+    border-radius: 12px;
+    margin-bottom: 15px;
+    border: 1px solid #eee;
+}
+.q-input, .a-input {
+    width: 100%;
+    padding: 10px;
+    margin-top: 8px;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+}
+.a-input { border-color: #50E3C2; background: #f9fffb; }
+/* ... a korábbi stílusaid ... */
+
+/* ÉRTESÍTŐ STÍLUSA */
+#custom-notification {
+    position: fixed;
+    top: 25px;
+    right: 25px;
+    background: white;
+    padding: 20px 30px;
+    border-radius: 12px;
+    box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+    z-index: 9999;
+    transition: all 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+.notification-hidden {
+    transform: translateX(150%);
+    opacity: 0;
+}
+
+.notification-visible {
+    transform: translateX(0);
+    opacity: 1;
+}
+
+.notification-content {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    font-weight: bold;
+}
+
+#notif-icon { font-size: 1.5rem; }
+.success-mode { border-left: 6px solid #2ecc71; color: #2ecc71; }
+.error-mode { border-left: 6px solid #e74c3c; color: #e74c3c; }
